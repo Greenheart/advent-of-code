@@ -1,0 +1,16 @@
+{
+  "name": "tdd-js-boilerplate",
+  "version": "1.0.0",
+  "main": "",
+  "license": "MIT",
+  "devDependencies": {
+    "tap-diff": "^0.1.1",
+    "tape": "^4.6.3",
+    "tape-watch": "^2.2.4"
+  },
+  "scripts": {
+    "test": "bash scripts/run-tests-once.sh",
+    "tdd": "bash scripts/run-tests.sh"
+  },
+  "author": "Samuel Plumppu"
+}
