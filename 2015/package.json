@@ -12,5 +12,8 @@
     "test": "bash scripts/run-tests-once.sh",
     "tdd": "bash scripts/run-tests.sh"
   },
-  "author": "Samuel Plumppu"
+  "author": "Samuel Plumppu",
+  "dependencies": {
+    "md5": "^2.2.1"
+  }
 }
