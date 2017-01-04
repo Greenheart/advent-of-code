@@ -1,6 +1,15 @@
 module.exports = { a, b }
 
 function a (input) {
+  return simulateGrid(input, GRID_TYPE.LIGHT_SWITCH)
+}
+
+function b (input) {
+  return simulateGrid(input, GRID_TYPE.BRIGHTNESS)
+}
+
+function simulateGrid (input, gridType) {
+  initGlobalState(gridType)
   let gridOfActiveLights = {}
 
   return input
@@ -9,9 +18,16 @@ function a (input) {
             updateGrid(gridOfActiveLights, instruction)
 
             if (index === instructions.length - 1) {
-              return Object.keys(gridOfActiveLights)
-                      .filter(pos => gridOfActiveLights[pos] === true)
-                      .length
+              switch (GRID_TYPE._ACTIVE) {
+                case GRID_TYPE.LIGHT_SWITCH:
+                  return Object.keys(gridOfActiveLights)
+                          .filter(pos => gridOfActiveLights[pos] === true)
+                          .length
+                case GRID_TYPE.BRIGHTNESS:
+                  return Object.keys(gridOfActiveLights)
+                          .reduce((totalBrightness, pos) =>
+                            totalBrightness + gridOfActiveLights[pos], 0)
+              }
             }
           }, 0)
 }
@@ -55,37 +71,73 @@ function parsePosition (pos) {
           }, {})
 }
 
-function applyOperation (coords, grid, actionType) {
-  for (let x = coords.start.x; x <= coords.stop.x; x++) {
-    for (let y = coords.start.y; y <= coords.stop.y; y++) {
+function applyOperation (coords, grid, modifier) {
+  for (let x = +coords.start.x; x <= coords.stop.x; x++) {
+    for (let y = +coords.start.y; y <= coords.stop.y; y++) {
       const pos = `${x}:${y}`
-      if (typeof actionType === 'boolean') {
-        grid[pos] = actionType
-      } else {
-        grid[pos] = !grid[pos]
+
+      switch (GRID_TYPE._ACTIVE) {
+        case GRID_TYPE.LIGHT_SWITCH:
+          if (typeof modifier === 'boolean') {
+            grid[pos] = modifier
+          } else {
+            grid[pos] = !grid[pos]
+          }
+          break
+        case GRID_TYPE.BRIGHTNESS:
+          // Prevent brightness from dropping below 0.
+          // Elegant way to assign default value
+          grid[pos] = Math.max((grid[pos] || 0) + modifier, 0)
+          break
       }
     }
   }
 }
 
-const OPERATION = {
-  'turn on': (coords, grid) => {
-    applyOperation(coords, grid, true)
+function initGlobalState (gridType) {
+  GRID_TYPE._ACTIVE = gridType
+  OPERATION = AVAILABLE_OPERATIONS[gridType]
+  OPERATION_NAMES = Object.keys(OPERATION)
+  UNWANTED_STRINGS = getUnwantedStrings()
+}
+
+const AVAILABLE_OPERATIONS = {
+  LIGHT_SWITCH: {
+    'turn on': (coords, grid) => {
+      applyOperation(coords, grid, true)
+    },
+    'toggle': (coords, grid) => {
+      applyOperation(coords, grid, 'toggle')
+    },
+    'turn off': (coords, grid) => {
+      applyOperation(coords, grid, false)
+    }
   },
-  'toggle': (coords, grid) => {
-    applyOperation(coords, grid, 'toggle')
-  },
-  'turn off': (coords, grid) => {
-    applyOperation(coords, grid, false)
+  BRIGHTNESS: {
+    'turn on': (coords, grid) => {
+      applyOperation(coords, grid, 1)
+    },
+    'toggle': (coords, grid) => {
+      applyOperation(coords, grid, 2)
+    },
+    'turn off': (coords, grid) => {
+      applyOperation(coords, grid, -1)
+    }
   }
 }
 
-const OPERATIONS = Object.keys(OPERATION)
+const GRID_TYPE = {
+  LIGHT_SWITCH: 'LIGHT_SWITCH',
+  BRIGHTNESS: 'BRIGHTNESS',
+  _ACTIVE: null
+}
 
-const UNWANTED_STRINGS = getUnwantedStrings()
+let OPERATION
+let OPERATION_NAMES
+let UNWANTED_STRINGS
 
 function getUnwantedStrings () {
-  const operationNames = OPERATIONS
+  const operationNames = OPERATION_NAMES
                           .map(operation => operation.split(' '))
                           .reduce((operationNames, nameParts) => {
                             nameParts.forEach(str => operationNames.push(str))
@@ -96,15 +148,11 @@ function getUnwantedStrings () {
 }
 
 function getOperation (instruction) {
-  for (const type of OPERATIONS) {
+  for (const type of OPERATION_NAMES) {
     if (instruction.startsWith(type)) {
       return OPERATION[type]
     }
   }
 
   throw new Error('Invalid operation: ', instruction)
-}
-
-function b (input) {
-
 }
