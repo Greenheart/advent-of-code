@@ -6,7 +6,7 @@ function a (input) {
   return input
           .split('\n')
           .reduce((totalLit, instruction, index, instructions) => {
-            updateGrid(gridOfActiveLights, instruction)
+            gridOfActiveLights = updateGrid(gridOfActiveLights, instruction)
 
             if (index === instructions.length - 1) {
               return Object.keys(gridOfActiveLights)
@@ -17,10 +17,11 @@ function a (input) {
 }
 
 function updateGrid (grid, instruction) {
+  let _grid = Object.assign({}, grid)
   const operation = getOperation(instruction)
   const coords = parseCoords(instruction)
 
-  operation(coords, grid)
+  return operation(coords, _grid)
 }
 
 function parseCoords (instruction) {
@@ -56,36 +57,38 @@ function parsePosition (pos) {
 }
 
 function applyOperation (coords, grid, actionType) {
+  const _grid = Object.assign({}, grid)
+
   for (let x = coords.start.x; x <= coords.stop.x; x++) {
     for (let y = coords.start.y; y <= coords.stop.y; y++) {
       const pos = `${x}:${y}`
       if (typeof actionType === 'boolean') {
-        grid[pos] = actionType
+        _grid[pos] = actionType
       } else {
-        grid[pos] = !grid[pos]
+        _grid[pos] = !_grid[pos]
       }
     }
   }
+  return _grid
 }
 
 const OPERATION = {
   'turn on': (coords, grid) => {
-    applyOperation(coords, grid, true)
+    return applyOperation(coords, grid, true)
   },
   'toggle': (coords, grid) => {
-    applyOperation(coords, grid, 'toggle')
+    return applyOperation(coords, grid, 'toggle')
   },
   'turn off': (coords, grid) => {
-    applyOperation(coords, grid, false)
+    return applyOperation(coords, grid, false)
   }
 }
-
-const OPERATIONS = Object.keys(OPERATION)
 
 const UNWANTED_STRINGS = getUnwantedStrings()
 
 function getUnwantedStrings () {
-  const operationNames = OPERATIONS
+  const operationNames = Object
+                          .keys(OPERATION)
                           .map(operation => operation.split(' '))
                           .reduce((operationNames, nameParts) => {
                             nameParts.forEach(str => operationNames.push(str))
@@ -96,7 +99,7 @@ function getUnwantedStrings () {
 }
 
 function getOperation (instruction) {
-  for (const type of OPERATIONS) {
+  for (const type of Object.keys(OPERATION)) {
     if (instruction.startsWith(type)) {
       return OPERATION[type]
     }
