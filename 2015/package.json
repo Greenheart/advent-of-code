@@ -10,7 +10,8 @@
   },
   "scripts": {
     "test": "bash scripts/run-tests-once.sh",
-    "tdd": "bash scripts/run-tests.sh"
+    "tdd": "bash scripts/run-tests.sh",
+    "debug": "node --inspect --debug-brk"
   },
   "author": "Samuel Plumppu",
   "dependencies": {
