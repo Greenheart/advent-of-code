@@ -10,6 +10,23 @@ const day = process.argv[2]
 const input = fs.readFileSync(path.join(__dirname, `/input/${day}`), 'utf8').trim()
 const solution = require(path.join(__dirname, `/solutions/${day}`))
 
+// Additional data required to run some solutions.
+const EXTRA_ARGUMENTS = {
+  '7': {
+    'a': ['a'],
+    'b': ['a']
+  }
+}
+
 for (const part of ['a', 'b']) {
-  console.log(`Day ${day}.${part.toUpperCase()}:\n\t${solution[part](input)}`)
+  const result = execute(solution, day, part, input, EXTRA_ARGUMENTS)
+  console.log(`Day ${day}.${part.toUpperCase()}:\n\t${JSON.stringify(result)}`)
+}
+
+function execute (solution, day, part, input, args) {
+  if (args[day] && args[day][part]) {
+    return solution[part](input, ...args[day][part])
+  }
+
+  return solution[part](input)
 }
