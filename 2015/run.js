@@ -26,8 +26,12 @@ const EXTRA_ARGUMENTS = {
 }
 
 for (const part of ['a', 'b']) {
+  const PART = part.toUpperCase()
+  console.log(`Day ${day}.${PART}:`)
+  console.time('time')
   const result = execute(solution, day, part, input, EXTRA_ARGUMENTS)
-  console.log(`Day ${day}.${part.toUpperCase()}:\n\t${JSON.stringify(result)}`)
+  console.timeEnd('time')
+  console.log(`\t\t-> ${JSON.stringify(result)}`)
 }
 
 function execute (solution, day, part, input, args) {
