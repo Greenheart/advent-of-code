@@ -15,6 +15,7 @@
   },
   "author": "Samuel Plumppu",
   "dependencies": {
+    "js-combinatorics": "^0.5.2",
     "md5": "^2.2.1"
   }
 }
