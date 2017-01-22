@@ -1,3 +1,5 @@
+'use strict'
+
 // const test = require('tape')
 // // Replace all N with day
 // test('Day N.A - ', t => {
