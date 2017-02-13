@@ -41,3 +41,5 @@ function execute (solution, day, part, input, args) {
 
   return solution[part](input)
 }
+
+process.exit(0)
