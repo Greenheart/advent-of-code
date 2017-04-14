@@ -84,11 +84,11 @@ const OPERATION = {
   }
 }
 
+const OPERATIONS = Object.keys(OPERATION)
 const UNWANTED_STRINGS = getUnwantedStrings()
 
 function getUnwantedStrings () {
-  const operationNames = Object
-                          .keys(OPERATION)
+  const operationNames = OPERATIONS
                           .map(operation => operation.split(' '))
                           .reduce((operationNames, nameParts) => {
                             nameParts.forEach(str => operationNames.push(str))
@@ -99,7 +99,7 @@ function getUnwantedStrings () {
 }
 
 function getOperation (instruction) {
-  for (const type of Object.keys(OPERATION)) {
+  for (const type of OPERATIONS) {
     if (instruction.startsWith(type)) {
       return OPERATION[type]
     }
